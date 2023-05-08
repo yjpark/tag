@@ -1,0 +1,11 @@
+list:
+    ls -l
+download-imdb-datasets:
+    # curl https://www.imdb.com/interfaces/ > imdb-datasets.html
+    curl https://datasets.imdbws.com/name.basics.tsv.gz > name.basics.tzv.gz
+    curl https://datasets.imdbws.com/title.akas.tsv.gz > title.akas.tsv.gz
+    curl https://datasets.imdbws.com/title.basics.tsv.gz > title.basics.tsv.gz
+    curl https://datasets.imdbws.com/title.crew.tsv.gz > title.crew.tsv.gz
+    curl https://datasets.imdbws.com/title.episode.tsv.gz > title.episode.tsv.gz
+    curl https://datasets.imdbws.com/title.principals.tsv.gz > title.principals.tsv.gz
+    curl https://datasets.imdbws.com/title.ratings.tsv.gz > title.ratings.tsv.gz

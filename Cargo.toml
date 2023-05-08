@@ -1,0 +1,27 @@
+[workspace.package]
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/edger-dev/tag"
+repository = "https://github.com/edger-dev-tag"
+
+[workspace]
+members = [
+    "demo/imdb-browser",
+    "demo/imdb-browser/static",
+]
+
+[workspace.dependencies]
+dioxus = "0.3.2"
+dioxus-web = "0.3.1"
+dioxus-router = "0.3.0"
+dioxus-ssr = "0.3.0"
+fermi = "0.3.0"
+
+# demo
+
+dioxus-class = "0.3.0"
+dioxus-tailwindcss = "0.3.0"
+dioxus-daisyui = "0.3.0"
+
+lazy_static = "1.4.0"
+simsearch = "0.2.4"
