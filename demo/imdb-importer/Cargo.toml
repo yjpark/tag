@@ -18,7 +18,6 @@ tracing-subscriber = { workspace = true }
 
 serde = { workspace = true }
 csv = { workspace = true }
-datafusion = { workspace = true }
 surrealdb = { workspace = true }
 lazy_static = { workspace = true }
 num_cpus = { workspace = true }

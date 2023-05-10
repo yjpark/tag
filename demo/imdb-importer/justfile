@@ -1,2 +1,6 @@
+build:
+    cargo build
+import-basic-names:
+    cargo run --release -- import-basic-names
 import-basic-titles:
-    cargo run -- import-basic-titles
+    cargo run --release -- import-basic-titles
