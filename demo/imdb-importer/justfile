@@ -1,0 +1,2 @@
+import-basic-titles:
+    cargo run -- import-basic-titles

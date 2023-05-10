@@ -1,0 +1,6 @@
+[submodule "external/surrealdb"]
+	path = external/surrealdb
+	url = git@github.com:surrealdb/surrealdb.git
+[submodule "external/arrow-rs"]
+	path = external/arrow-rs
+	url = git@github.com:yjpark/arrow-rs.git

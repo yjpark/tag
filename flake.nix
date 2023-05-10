@@ -32,6 +32,7 @@
             openssl
             # utility
             just
+            # evcxr
             # node tools
             nodejs
             nodePackages.npm
