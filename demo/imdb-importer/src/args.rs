@@ -21,4 +21,9 @@ pub enum Command {
         #[arg(long, default_value = "data/name.basics.tzv")]
         path: PathBuf, 
     },
+    #[command()]
+    ImportTitlePrincipals {
+        #[arg(long, default_value = "data/title.principals.tsv")]
+        path: PathBuf, 
+    },
 }

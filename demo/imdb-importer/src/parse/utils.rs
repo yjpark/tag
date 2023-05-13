@@ -4,6 +4,8 @@ use std::{path::Path, error::Error};
 use serde::de::{self, Unexpected};
 use serde::{Deserialize};
 
+pub const NULL: &'static str = "\\N";
+
 // https://github.com/serde-rs/serde/issues/1344
 pub fn bool_from_int<'de, D>(deserializer: D) -> Result<bool, D::Error>
 where
@@ -24,7 +26,7 @@ where
     D: serde::Deserializer<'de>,
 {
     match String::deserialize(deserializer)?.as_ref() {
-        "\\N" => Ok(0),
+        NULL => Ok(0),
         other => {
             match other.parse::<u16>() {
                 Ok(v) => Ok(v),
@@ -32,6 +34,45 @@ where
                     Err(de::Error::invalid_value(
                         Unexpected::Str(other),
                         &"\\N or integer",
+                    )),
+            }
+        }
+    }
+}
+
+pub fn parse_option_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    match String::deserialize(deserializer)?.as_ref() {
+        NULL => Ok(None),
+        other => {
+            match other.parse::<String>() {
+                Ok(v) => Ok(Some(v)),
+                Err(_err) =>
+                    Err(de::Error::invalid_value(
+                        Unexpected::Str(other),
+                        &"\\N or string",
+                    )),
+            }
+        }
+    }
+}
+pub fn parse_option_string_array<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    match String::deserialize(deserializer)?.as_ref() {
+        NULL => Ok(Vec::new()),
+        other => {
+            match other.parse::<String>() {
+                Ok(v) => {
+                    Ok(crate::import::utils::split_by_comma(&v))
+                },
+                Err(_err) =>
+                    Err(de::Error::invalid_value(
+                        Unexpected::Str(other),
+                        &"\\N or string array",
                     )),
             }
         }

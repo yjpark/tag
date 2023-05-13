@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::parse::name::Record;
 
-use super::utils::{Row, create_rows, split_by_comma};
+use super::utils::{Row, create_rows, split_by_comma, define_schemaless_table};
 use super::{table, relation};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -36,6 +36,8 @@ impl From<Record> for BasicName {
 }
 
 pub async fn import_basic_names(rows: Vec<BasicName>) {
+    define_schemaless_table(relation::KNOWN_FOR).await;
+
     create_rows(table::NAME, rows, |row| {
         if row.known_for_titles.len() == 0 {
             None
@@ -47,5 +49,5 @@ pub async fn import_basic_names(rows: Vec<BasicName>) {
                 }).collect::<Vec<String>>().join("\n")
             )
         }
-    }).await
+    }, false).await
 }

@@ -58,9 +58,13 @@ pub async fn init_db_client() -> Surreal<Client> {
     db
 }
 
-pub async fn create_rows_chunk<R>
-    (table: &str, chunk_index: usize, rows: Vec<R>, extra: fn(&R) -> Option<String>)
-    where 
+pub async fn create_rows_chunk<R>(
+    table: &str,
+    chunk_index: usize,
+    rows: Vec<R>,
+    extra: fn(&R) -> Option<String>,
+    extra_only: bool,
+) where 
         R: Row + for<'de> Deserialize<'de>,
 {
     let db = super::utils::init_db_client().await;
@@ -72,12 +76,14 @@ pub async fn create_rows_chunk<R>
     let mut last_info_time = std::time::SystemTime::now();
 
     for row in rows {
-        let id = row.get_id();
-        let created: Result<R, surrealdb::Error> = db.create((table, &id))
-            .content(&row)
-            .await;
-        if let Err(err) = created {
-            warn!(table, chunk_index, "create row failed: {} {:#?} -> {:#?}", id, &row, err);
+        if !extra_only {
+            let id = row.get_id();
+            let created: Result<R, surrealdb::Error> = db.create((table, &id))
+                .content(&row)
+                .await;
+            if let Err(err) = created {
+                warn!(table, chunk_index, "create row failed: {} {:#?} -> {:#?}", id, &row, err);
+            }
         }
         if let Some(extra_query) = extra(&row) {
             if let Err(err) = db.query(&extra_query).await {
@@ -94,9 +100,20 @@ pub async fn create_rows_chunk<R>
     }
 }
 
-pub async fn create_rows<R>
-    (table: &'static str, rows: Vec<R>, extra: fn(&R) -> Option<String>)
-    where
+pub async fn define_schemaless_table(table: &'static str) {
+    let db = super::utils::init_db_client().await;
+    let define_table = format!("DEFINE {table} DROP SCHEMALESS");
+    if let Err(err) = db.query(&define_table).await {
+        warn!(table, "define schemaless table failed: {} -> {:#?}", &define_table, err);
+    }
+}
+
+pub async fn create_rows<R>(
+    table: &'static str,
+    rows: Vec<R>,
+    extra: fn(&R) -> Option<String>,
+    extra_only: bool,
+) where
         R: 'static + Row + for<'de> Deserialize<'de>,
 {
     if rows.len() == 0 {
@@ -109,11 +126,7 @@ pub async fn create_rows<R>
     let num_cpus: usize = *NUM_CPUS;
     let chunk_size = max(MIN_CHUNK_SIZE, rows.len() / num_cpus);
 
-    let db = super::utils::init_db_client().await;
-    let define_table = format!("DEFINE {table} DROP SCHEMALESS");
-    if let Err(err) = db.query(&define_table).await {
-        warn!(table, chunk_index, "create table failed: {} -> {:#?}", &define_table, err);
-    }
+    define_schemaless_table(table).await;
 
     if rows.len() > chunk_size {
         info!(total, num_cpus, chunk_size, "running in chunks mode");
@@ -123,7 +136,7 @@ pub async fn create_rows<R>
                 chunk_rows.push(x.clone());
             }
             let handle = tokio::spawn(async move {
-                create_rows_chunk(table, chunk_index, chunk_rows, extra).await;
+                create_rows_chunk(table, chunk_index, chunk_rows, extra, extra_only).await;
             });
             handles.push(handle);
             chunk_index += 1;
@@ -144,7 +157,7 @@ pub async fn create_rows<R>
         }
     } else {
         info!(total, "running in single mode");
-        create_rows_chunk(table, chunk_index, rows, extra).await;
+        create_rows_chunk(table, chunk_index, rows, extra, extra_only).await;
     }
 }
 

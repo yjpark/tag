@@ -41,5 +41,5 @@ impl From<Record> for BasicTitle {
 }
 
 pub async fn import_basic_titles(rows: Vec<BasicTitle>) {
-    create_rows(table::TITLE, rows, |_row| None).await
+    create_rows(table::TITLE, rows, |_row| None, false).await
 }

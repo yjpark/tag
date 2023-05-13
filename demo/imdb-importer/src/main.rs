@@ -11,6 +11,8 @@ use imdb_importer::parse::title::parse_basic_titles;
 use imdb_importer::import::title::{import_basic_titles, BasicTitle};
 use imdb_importer::parse::name::parse_basic_names;
 use imdb_importer::import::name::{import_basic_names, BasicName};
+use imdb_importer::parse::principal::parse_title_principals;
+use imdb_importer::import::principal::{import_title_principals, TitlePrincipal};
 
 /*
 DEFINE TABLE title SCHEMALESS;
@@ -18,6 +20,8 @@ DEFINE TABLE title SCHEMALESS;
 
 pub const YEAR: u16 = 2000;
 pub const MAX_TITLE_COUNT: usize = usize::MAX;
+pub const MAX_NAME_COUNT: usize = usize::MAX;
+pub const MAX_PRINCIPAL_COUNT: usize = usize::MAX;
 
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 16)]
@@ -38,9 +42,8 @@ async fn main() {
 
             let mut title_ids = HashSet::new();
             title_ids.extend(read_year_title_ids(YEAR));
-            info!(year = YEAR, ids = title_ids.len(), "loaded year title ids in year");
 
-            let names: Vec<BasicName> = parse_basic_names(path.as_path(), MAX_TITLE_COUNT, |record| {
+            let names: Vec<BasicName> = parse_basic_names(path.as_path(), MAX_NAME_COUNT, |record| {
                 let titles = split_by_comma(&record.known_for_titles);
                 for title in titles.iter() {
                     if title_ids.contains(title) {
@@ -50,6 +53,17 @@ async fn main() {
                 false
             }).unwrap();
             import_basic_names(names).await
+        },
+        Command::ImportTitlePrincipals { path } => {
+            info!(path = path.as_path().to_str(), "parsing title principals");
+
+            let mut title_ids = HashSet::new();
+            title_ids.extend(read_year_title_ids(YEAR));
+
+            let principals: Vec<TitlePrincipal> = parse_title_principals(path.as_path(), MAX_PRINCIPAL_COUNT, |record| {
+                title_ids.contains(record.tconst.as_str())
+            }).unwrap();
+            import_title_principals(principals).await
         },
     }
 }
@@ -73,5 +87,6 @@ fn read_year_title_ids(year: u16) -> Vec<String> {
             ids.push(id);
         }
     }
+    info!(year = YEAR, count = ids.len(), "read year title ids");
     ids
 }
