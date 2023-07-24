@@ -110,6 +110,18 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         self.children.get(uuid).map(|x| x.value().clone() )
     }
 
+    pub fn get_child_deep(&self, uuid: &Uuid) -> Option<Arc<Self>> {
+        if let Some(child) = self.get_child(uuid) {
+            return Some(child);
+        }
+        for kv in self.children.iter() {
+            if let Some(child) = kv.value().get_child_deep(uuid) {
+                return Some(child);
+            }
+        }
+        None
+    }
+
     pub fn new_item(arc_self: &Arc<Self>,
         item_uuid: Uuid,
         item_data: ID,
