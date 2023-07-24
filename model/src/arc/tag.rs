@@ -101,25 +101,25 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         child_data: TD,
     ) -> Arc<Self> {
         let child = Self::new_arc(child_proto,  child_data, Some(arc_self.clone()));
-        arc_self.add_child(child.clone());
+        Self::add_child(arc_self, child.clone());
         child
     }
 
     pub fn add_child(arc_self: &mut Arc<Self>, child: Arc<Self>) {
-        arc_self.children.insert(child.uuid().clone(), child);
+        arc_self.children.insert(child.as_ref().uuid().clone(), child);
     }
 
     pub fn new_item(arc_self: &mut Arc<Self>,
         item_uuid: Uuid,
         item_data: ID,
     ) -> Arc<Item<TD, ID>> {
-        let item = Item::<TD, ID>::new_arc(item_uuid, item_data);
-        item.add_tag(arc_self.clone());
-        arc_self.add_item(item.clone());
+        let mut item = Item::<TD, ID>::new_arc(item_uuid, item_data);
+        Item::<TD, ID>::add_tag(&mut item, arc_self.clone());
+        Self::add_item(arc_self, item.clone());
         item
     }
 
     pub fn add_item(arc_self: &mut Arc<Self>, item: Arc<Item<TD, ID>>) {
-        arc_self.items.insert(item.uuid().clone(), item);
+        arc_self.items.insert(item.as_ref().uuid.clone(), item);
     }
 }
