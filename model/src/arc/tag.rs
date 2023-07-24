@@ -22,7 +22,11 @@ impl<TD: Debug, ID: Debug > CoreTag for Tag<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug > ProtoTag for Tag<TD, ID> {
+impl<TD, ID > ProtoTag for Tag<TD, ID>
+    where
+        TD: Debug + Send + Sync + 'static,
+        ID: Debug + Send + Sync + 'static,
+{
     fn parent(&self) -> Option<Uuid> {
         self.parent.as_ref()
             .and_then(|x| x.upgrade())
@@ -30,7 +34,11 @@ impl<TD: Debug, ID: Debug > ProtoTag for Tag<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug > ModelTag for Tag<TD, ID> {
+impl<TD, ID> ModelTag for Tag<TD, ID>
+    where
+        TD: Debug + Send + Sync + 'static,
+        ID: Debug + Send + Sync + 'static,
+{
     type Data = TD;
     type Item = Item<TD, ID>;
 
