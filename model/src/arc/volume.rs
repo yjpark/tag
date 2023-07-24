@@ -4,7 +4,7 @@ use std::future::Future;
 
 use async_trait::async_trait;
 
-use super::prelude::{Uuid, Hash, IndexMap, LoadBodyResult, Item, ItemData, Tag,ModelVolume};
+use super::prelude::{Uuid, Hash, DashMap, LoadBodyResult, Item, ItemData, Tag,ModelVolume};
 
 #[derive(Clone, Debug)]
 pub struct Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
@@ -19,7 +19,7 @@ pub struct Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
     pub uuid: Uuid,
     pub data: VD,
     pub root: Arc<Tag<TD, ID>>,
-    pub items: IndexMap<Uuid, Arc<Item<TD, ID>>>,
+    pub items: DashMap<Uuid, Arc<Item<TD, ID>>>,
 
     loader: Loader,
     async_loader: AsyncLoader,
@@ -62,8 +62,8 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, V
     }
 
     fn each_item<F: Fn(&Self::Item) -> bool>(&self, callback: &F) -> bool {
-        for item in self.items.values() {
-            if callback(item) {
+        for kv in self.items.iter() {
+            if callback(kv.value()) {
                 return true;
             }
         }

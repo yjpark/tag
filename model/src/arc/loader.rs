@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use std::future::Future;
 use snafu::prelude::*;
-use super::prelude::{Uuid, Hash, IndexMap, Item, ItemData, Tag, LoadBodyResult, Volume};
+use super::prelude::{Uuid, Hash, DashMap, Item, ItemData, Tag, LoadBodyResult, Volume};
 
 #[derive(Debug, Snafu)]
 pub enum LoadVolumeError {
@@ -36,13 +36,13 @@ pub fn load_volume<
         ItemUuidIterator: Iterator<Item = Uuid>,
 {
     let mut root = Tag::<TD, ID>::root_arc(uuid.clone(), tag_data_factory(&uuid));
-    let mut items = IndexMap::new();
+    let mut items = DashMap::new();
     for item_uuid in item_uuids {
         let item_data = item_data_factory(&item_uuid);
         let mut item = Item::<TD, ID> {
             uuid: item_uuid.clone(),
             data: item_data,
-            tags: IndexMap::new(),
+            tags: DashMap::new(),
         };
         items.insert(item_uuid.clone(), Arc::new(item));
     }

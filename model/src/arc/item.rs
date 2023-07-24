@@ -1,13 +1,13 @@
 use std::sync::Arc;
 use std::fmt::Debug;
 
-use super::prelude::{Uuid, IndexMap, Tag, ModelItem, ItemData};
+use super::prelude::{Uuid, DashMap, Tag, ModelItem, ItemData};
 
 #[derive(Clone, Debug)]
 pub struct Item<TD: Debug, ID: Debug + ItemData> {
     pub uuid: Uuid,
     pub data: ID,
-    pub tags: IndexMap<Uuid, Arc<Tag<TD, ID>>>,
+    pub tags: DashMap<Uuid, Arc<Tag<TD, ID>>>,
 }
 
 impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
@@ -27,8 +27,8 @@ impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
     }
 
     fn each_tag<F: Fn(&Self::Tag) -> bool>(&self, callback: &F) -> bool {
-        for tag in self.tags.values() {
-            if callback(tag) {
+        for kv in self.tags.iter() {
+            if callback(kv.value()) {
                 return true;
             }
         }

@@ -3,7 +3,12 @@ pub mod item;
 pub mod volume;
 pub mod loader;
 
+pub use dashmap;
+
 pub mod prelude {
+    #[doc(hidden)]
+    pub use dashmap::DashMap;
+
     #[doc(hidden)]
     pub use crate::prelude::{*,
         Tag as ModelTag,

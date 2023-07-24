@@ -1,15 +1,15 @@
 use std::sync::Arc;
 use std::fmt::Debug;
 
-use super::prelude::{Uuid, IndexMap, CoreTag, ProtoTag, ModelTag, Item, ItemData};
+use super::prelude::{Uuid, DashMap, CoreTag, ProtoTag, ModelTag, Item, ItemData};
 
 #[derive(Clone, Debug)]
 pub struct Tag<TD: Debug, ID: Debug + ItemData> {
     pub proto: Arc<dyn ProtoTag + Send + Sync>,
     pub data: TD,
     pub parent: Option<Arc<Tag<TD, ID>>>,
-    pub children: IndexMap<Uuid, Arc<Tag<TD, ID>>>,
-    pub items: IndexMap<Uuid, Arc<Item<TD, ID>>>,
+    pub children: DashMap<Uuid, Arc<Tag<TD, ID>>>,
+    pub items: DashMap<Uuid, Arc<Item<TD, ID>>>,
 }
 
 impl<TD: Debug, ID: Debug + ItemData> CoreTag for Tag<TD, ID> {
@@ -41,8 +41,8 @@ impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
     }
 
     fn each_child<F: Fn(&Self) -> bool>(&self, callback: &F) -> bool {
-        for child in self.children.values() {
-            if callback(child) {
+        for kv in self.children.iter() {
+            if callback(kv.value()) {
                 return true;
             }
         }
@@ -58,8 +58,8 @@ impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
     }
 
     fn each_item<F: Fn(&Self::Item) -> bool>(&self, callback: &F) -> bool {
-        for item in self.items.values() {
-            if callback(item) {
+        for kv in self.items.iter() {
+            if callback(kv.value()) {
                 return true;
             }
         }
@@ -73,8 +73,8 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
             proto,
             data,
             parent: parent,
-            children: IndexMap::new(),
-            items: IndexMap::new(),
+            children: DashMap::new(),
+            items: DashMap::new(),
         }
     }
 
