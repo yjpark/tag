@@ -56,7 +56,7 @@ impl<TD: Debug, ID: Debug + ItemData> Item<TD, ID> {
         Arc::new(Self::new(uuid, data))
     }
 
-    pub fn add_tag(arc_self: &Arc<Self>, tag: Arc<Tag<TD, ID>>) {
-        arc_self.tags.insert(tag.as_ref().proto.uuid().clone(), tag);
+    pub fn add_tag(&self, tag: Arc<Tag<TD, ID>>) {
+        self.tags.insert(tag.as_ref().proto.uuid().clone(), tag);
     }
 }
