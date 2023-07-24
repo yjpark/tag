@@ -10,7 +10,11 @@ pub struct Item<TD: Debug, ID: Debug > {
     pub tags: DashMap<Uuid, Arc<Tag<TD, ID>>>,
 }
 
-impl<TD: Debug, ID: Debug > ModelItem for Item<TD, ID> {
+impl<TD, ID> ModelItem for Item<TD, ID>
+    where
+        TD: Debug + Send + Sync + 'static,
+        ID: Debug + Send + Sync + 'static,
+{
     type Data = ID;
     type Tag = Tag<TD, ID>;
 

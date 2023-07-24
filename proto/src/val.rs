@@ -25,7 +25,7 @@ impl<V> CoreTag for ValTag<V>
 }
 
 impl<V> Tag for ValTag<V>
-    where V: Debug
+    where V: Debug + Send + Sync + 'static
 {
     fn parent(&self) -> Option<Uuid> {
         self.parent.clone()

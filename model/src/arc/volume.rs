@@ -28,9 +28,9 @@ pub struct Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
 #[async_trait]
 impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
-        TD: Debug + Send + Sync,
-        ID: Debug  + Send + Sync,
-        VD: Debug + Send + Sync,
+        TD: Debug + Send + Sync + 'static,
+        ID: Debug  + Send + Sync + 'static,
+        VD: Debug + Send + Sync + 'static,
         Body: Send + Sync,
         Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,
         AsyncLoader: Fn(&VD, &Hash) -> TF + Send + Sync,
