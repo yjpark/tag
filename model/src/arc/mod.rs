@@ -13,6 +13,7 @@ pub mod prelude {
     pub use crate::prelude::{*,
         Tag as ModelTag,
         Item as ModelItem,
+        ItemData as ModelItemData,
         Volume as ModelVolume,
     };
 
@@ -20,7 +21,7 @@ pub mod prelude {
     pub use super::tag::Tag;
 
     #[doc(hidden)]
-    pub use super::item::Item;
+    pub use super::item::{Item, ItemData};
 
     #[doc(hidden)]
     pub use super::volume::Volume;

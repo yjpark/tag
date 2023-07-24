@@ -1,6 +1,7 @@
 use std::fmt::Debug;
+use std::sync::Arc;
 use std::future::Future;
-use super::prelude::{Uuid, Hash, ItemData, LoadBodyResult, Volume};
+use super::prelude::{Uuid, Hash, ProtoTag, Tag, ItemData, LoadBodyResult, Volume};
 
 pub fn load_volume<
         VD, TD, ID, Body, Loader, AsyncLoader, TF,
@@ -30,7 +31,17 @@ pub fn load_volume<
     );
     for item_uuid in item_uuids {
         let item = volume.new_item(item_uuid.clone(), item_data_factory(&item_uuid));
-        item.data.each_tag
+        for proto_tag in item.data.iter_tags() {
+            let tag_uuid = proto_tag.uuid();
+            let tag = volume.get_tag(tag_uuid)
+                .unwrap_or_else(|| {
+                    let parent = proto_tag.parent()
+                        .and_then(|x| volume.get_tag(&x))
+                        .unwrap_or_else(|| volume.root.clone() );
+                    Tag::<TD, ID>::new_child(parent, proto_tag.clone(), tag_data_factory(tag_uuid))
+                });
+            tag.add_item(item.clone());
+        }
     }
     volume
 }

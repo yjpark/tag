@@ -124,4 +124,8 @@ impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> Volume<VD, TD, ID, Body, Loader,
     pub fn add_item(&self, item: Arc<Item<TD, ID>>) {
         self.items.insert(item.uuid.clone(), item);
     }
+
+    pub fn get_tag(&self, uuid: &Uuid) -> Option<Arc<Tag<TD, ID>>> {
+        self.root.get_child_deep(uuid)
+    }
 }

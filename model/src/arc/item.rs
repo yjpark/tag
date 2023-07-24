@@ -1,7 +1,11 @@
 use std::sync::Arc;
 use std::fmt::Debug;
 
-use super::prelude::{Uuid, DashMap, Tag, ModelItem, ItemData};
+use super::prelude::{Uuid, DashMap, ProtoTag, Tag, ModelItem, ModelItemData};
+
+pub trait ItemData : ModelItemData {
+    fn iter_tags(&self) -> dyn Iterator<Item = Arc<dyn ProtoTag>>;
+}
 
 #[derive(Clone, Debug)]
 pub struct Item<TD: Debug, ID: Debug + ItemData> {
