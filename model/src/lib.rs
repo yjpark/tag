@@ -7,7 +7,6 @@ pub mod item;
 pub mod tag;
 pub mod volume;
 
-#[cfg(feature = "arc")]
 pub mod arc;
 
 pub mod prelude {
