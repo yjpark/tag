@@ -113,8 +113,8 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         item_uuid: Uuid,
         item_data: ID,
     ) -> Arc<Item<TD, ID>> {
-        let mut item = Item::<TD, ID>::new_arc(item_uuid, item_data);
-        Item::<TD, ID>::add_tag(&mut item, arc_self.clone());
+        let item = Item::<TD, ID>::new_arc(item_uuid, item_data);
+        item.add_tag(arc_self.clone());
         arc_self.add_item(item.clone());
         item
     }
