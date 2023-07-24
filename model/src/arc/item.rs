@@ -1,21 +1,16 @@
 use std::sync::Arc;
-use std::slice::Iter;
 use std::fmt::Debug;
 
-use super::prelude::{Uuid, DashMap, ProtoTag, Tag, ModelItem, ModelItemData};
-
-pub trait ItemData : ModelItemData {
-    fn iter_tags<'a>(&self) -> Iter<'a, Arc<dyn ProtoTag + Send + Sync>>;
-}
+use super::prelude::{Uuid, DashMap, Tag, ModelItem};
 
 #[derive(Clone, Debug)]
-pub struct Item<TD: Debug, ID: Debug + ItemData> {
+pub struct Item<TD: Debug, ID: Debug > {
     pub uuid: Uuid,
     pub data: ID,
     pub tags: DashMap<Uuid, Arc<Tag<TD, ID>>>,
 }
 
-impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
+impl<TD: Debug, ID: Debug > ModelItem for Item<TD, ID> {
     type Data = ID;
     type Tag = Tag<TD, ID>;
 
@@ -48,7 +43,7 @@ impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug + ItemData> Item<TD, ID> {
+impl<TD: Debug, ID: Debug > Item<TD, ID> {
     pub fn new(uuid: Uuid, data: ID) -> Self {
         Self {
             uuid,

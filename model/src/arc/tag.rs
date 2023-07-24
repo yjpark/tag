@@ -1,10 +1,10 @@
 use std::sync::{Arc, Weak};
 use std::fmt::Debug;
 
-use super::prelude::{Uuid, DashMap, CoreTag, ProtoTag, ModelTag, Item, ItemData};
+use super::prelude::{Uuid, DashMap, CoreTag, ProtoTag, ModelTag, Item};
 
 #[derive(Clone, Debug)]
-pub struct Tag<TD: Debug, ID: Debug + ItemData> {
+pub struct Tag<TD: Debug, ID: Debug > {
     pub proto: Arc<dyn ProtoTag + Send + Sync>,
     pub data: TD,
     pub parent: Option<Weak<Tag<TD, ID>>>,
@@ -12,7 +12,7 @@ pub struct Tag<TD: Debug, ID: Debug + ItemData> {
     pub items: DashMap<Uuid, Arc<Item<TD, ID>>>,
 }
 
-impl<TD: Debug, ID: Debug + ItemData> CoreTag for Tag<TD, ID> {
+impl<TD: Debug, ID: Debug > CoreTag for Tag<TD, ID> {
     fn uuid(&self) -> &Uuid {
         self.proto.uuid()
     }
@@ -22,7 +22,7 @@ impl<TD: Debug, ID: Debug + ItemData> CoreTag for Tag<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug + ItemData> ProtoTag for Tag<TD, ID> {
+impl<TD: Debug, ID: Debug > ProtoTag for Tag<TD, ID> {
     fn parent(&self) -> Option<Uuid> {
         self.parent.as_ref()
             .and_then(|x| x.upgrade())
@@ -30,7 +30,7 @@ impl<TD: Debug, ID: Debug + ItemData> ProtoTag for Tag<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
+impl<TD: Debug, ID: Debug > ModelTag for Tag<TD, ID> {
     type Data = TD;
     type Item = Item<TD, ID>;
 
@@ -78,7 +78,7 @@ impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
+impl<TD: Debug, ID: Debug > Tag<TD, ID> {
     pub fn new(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Weak<Self>>) -> Self {
         Self {
             proto,

@@ -4,13 +4,13 @@ use std::future::Future;
 
 use async_trait::async_trait;
 
-use super::prelude::{Uuid, Hash, DashMap, LoadBodyResult, Item, ItemData, ProtoTag, Tag, ModelVolume};
+use super::prelude::{Uuid, Hash, DashMap, LoadBodyResult, Item, ProtoTag, Tag, ModelVolume};
 
 #[derive(Clone, Debug)]
 pub struct Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug,
-        ID: Debug + ItemData,
+        ID: Debug ,
         VD: Debug,
         Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body>,
         AsyncLoader: Fn(&VD, &Hash) -> TF,
@@ -29,7 +29,7 @@ pub struct Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
 impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug + Send + Sync,
-        ID: Debug + ItemData + Send + Sync,
+        ID: Debug  + Send + Sync,
         VD: Debug + Send + Sync,
         Body: Send + Sync,
         Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,
@@ -85,7 +85,7 @@ impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<VD, TD, I
 impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug + Send + Sync,
-        ID: Debug + ItemData + Send + Sync,
+        ID: Debug  + Send + Sync,
         VD: Debug + Send + Sync,
         Body: Send + Sync,
         Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,

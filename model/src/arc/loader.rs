@@ -1,10 +1,12 @@
 use std::fmt::Debug;
+use std::sync::Arc;
 use std::future::Future;
-use super::prelude::{Uuid, Hash, Tag, ItemData, LoadBodyResult, Volume};
+use super::prelude::{Uuid, Hash, ProtoTag, Tag, LoadBodyResult, Volume};
 
 pub fn load_volume<
         VD, TD, ID, Body, Loader, AsyncLoader, TF,
-        TagDataFactory, ItemDataFactory, ItemUuidIterator> (
+        TagDataFactory, ItemDataFactory,
+        ItemUuidIterator, ItemTagsIterator, TagsIterator> (
     uuid: Uuid,
     data: VD,
     loader: Loader,
@@ -12,10 +14,11 @@ pub fn load_volume<
     tag_data_factory: TagDataFactory,
     item_data_factory: ItemDataFactory,
     item_uuids: ItemUuidIterator,
+    item_tags: ItemTagsIterator,
 ) -> Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug + Send + Sync,
-        ID: Debug + ItemData + Send + Sync,
+        ID: Debug  + Send + Sync,
         VD: Debug + Send + Sync,
         Body: Send + Sync,
         Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,
@@ -24,13 +27,15 @@ pub fn load_volume<
         TagDataFactory: Fn(&Uuid) -> TD,
         ItemDataFactory: Fn(&Uuid) -> ID,
         ItemUuidIterator: Iterator<Item = Uuid>,
+        ItemTagsIterator: Fn(&Uuid) -> TagsIterator,
+        TagsIterator: Iterator<Item = Arc<dyn ProtoTag + Send + Sync>>,
 {
     let volume = Volume::<VD, TD, ID, Body, Loader, AsyncLoader, TF>::new(
         loader, async_loader, uuid, data, tag_data_factory(&uuid),
     );
     for item_uuid in item_uuids {
         let item = volume.new_item(item_uuid.clone(), item_data_factory(&item_uuid));
-        for proto_tag in item.data.iter_tags() {
+        for proto_tag in item_tags(&item_uuid) {
             let tag_uuid = proto_tag.uuid();
             let tag = volume.get_tag(tag_uuid)
                 .unwrap_or_else(|| {

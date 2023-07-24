@@ -18,7 +18,7 @@ pub mod prelude {
     pub use tag_proto::prelude::{*, Tag as ProtoTag};
 
     #[doc(hidden)]
-    pub use crate::item::{Item, ItemData};
+    pub use crate::item::Item;
 
     #[doc(hidden)]
     pub use crate::tag::Tag;
