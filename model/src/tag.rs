@@ -9,10 +9,11 @@ pub trait Tag : ProtoTag {
 
     fn children_count(&self) -> usize;
     fn each_child<F: Fn(&Self) -> bool>(&self, callback: &F) -> bool;
+    fn with_child<O, F: Fn(Option<&Self>) -> O>(&self, uuid: &Uuid, callback: &F) -> O;
 
     fn items_count(&self) -> usize;
-    fn get_item(&self, uuid: &Uuid) -> Option<&Self::Item>;
     fn each_item<F: Fn(&Self::Item) -> bool>(&self, callback: &F) -> bool;
+    fn with_item<O, F: Fn(Option<&Self::Item>) -> O>(&self, uuid: &Uuid, callback: &F) -> O;
 
     fn each_child_deep<F: Fn(&Self) -> bool>(&self, callback: &F) -> bool {
         self.each_child(&|child| {

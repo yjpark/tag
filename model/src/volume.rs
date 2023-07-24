@@ -27,8 +27,8 @@ pub trait Volume {
     fn root(&self) -> &Self::Tag;
 
     fn items_count(&self) -> usize;
-    fn get_item(&self, uuid: &Uuid) -> Option<&Self::Item>;
     fn each_item<F: Fn(&Self::Item) -> bool>(&self, callback: &F) -> bool;
+    fn with_item<O, F: Fn(Option<&Self::Item>)-> O>(&self, uuid: &Uuid, callback: &F) -> O;
 
     fn load_body(&self, hash: &Hash) -> LoadBodyResult<Self::Body>;
     async fn load_body_async(&self, hash: &Hash) -> LoadBodyResult<Self::Body>;

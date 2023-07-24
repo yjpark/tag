@@ -34,4 +34,11 @@ impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
         }
         false
     }
+
+    fn with_tag<O, F: Fn(Option<&Self::Tag>) -> O>(&self, uuid: &Uuid, callback: &F) -> O {
+        match self.tags.get(uuid) {
+            None => callback(None),
+            Some(kv) => callback(Some(kv.value().as_ref())),
+        }
+    }
 }

@@ -9,9 +9,12 @@ members = [
     "core",
     "proto",
     "model",
+]
+exclude = [
     "demo/imdb-importer",
     "demo/imdb-browser",
     "demo/imdb-browser/static",
+    "external/*",
 ]
 
 [workspace.dependencies]

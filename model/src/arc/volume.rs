@@ -57,10 +57,6 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, V
         self.items.len()
     }
 
-    fn get_item(&self, uuid: &Uuid) -> Option<&Self::Item> {
-        self.items.get(uuid).map(|x| x.as_ref())
-    }
-
     fn each_item<F: Fn(&Self::Item) -> bool>(&self, callback: &F) -> bool {
         for kv in self.items.iter() {
             if callback(kv.value()) {
@@ -68,6 +64,13 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, V
             }
         }
         false
+    }
+
+    fn with_item<O, F: Fn(Option<&Self::Item>) -> O>(&self, uuid: &Uuid, callback: &F) -> O {
+        match self.items.get(uuid) {
+            None => callback(None),
+            Some(kv) => callback(Some(kv.value().as_ref())),
+        }
     }
 
     fn load_body(&self, hash: &Hash) -> LoadBodyResult<Self::Body> {
