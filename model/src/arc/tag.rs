@@ -96,11 +96,30 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         Self::new_arc(proto, data, None)
     }
 
-    pub fn add_child(arc_self: &mut Arc<Self>,
+    pub fn new_child(arc_self: &mut Arc<Self>,
         child_proto: Arc<dyn ProtoTag + Send + Sync>,
         child_data: TD,
-    ) {
+    ) -> Arc<Self> {
         let child = Self::new_arc(child_proto,  child_data, Some(arc_self.clone()));
+        arc_self.add_child(child.clone());
+        child
+    }
+
+    pub fn add_child(arc_self: &mut Arc<Self>, child: Arc<Self>) {
         arc_self.children.insert(child.uuid().clone(), child);
+    }
+
+    pub fn new_item(arc_self: &mut Arc<Self>,
+        item_uuid: Uuid,
+        item_data: ID,
+    ) -> Arc<Item<TD, ID>> {
+        let item = Item::<TD, ID>::new_arc(item_uuid, item_data);
+        item.add_tag(arc_self.clone());
+        arc_self.add_item(item.clone());
+        item
+    }
+
+    pub fn add_item(arc_self: &mut Arc<Self>, item: Arc<Item<TD, ID>>) {
+        arc_self.items.insert(item.uuid().clone(), item);
     }
 }

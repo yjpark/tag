@@ -46,12 +46,7 @@ pub fn load_volume<
         };
         items.insert(item_uuid.clone(), Arc::new(item));
     }
-    Ok(Volume::<TD, ID, VD, Body, Loader, AsyncLoader, TF>{
-        uuid,
-        data,
-        root,
-        items,
-        loader,
-        async_loader,
-    })
+    Ok(Volume::<TD, ID, VD, Body, Loader, AsyncLoader, TF>::new(
+        uuid, data, root, items, loader, async_loader,
+    ))
 }

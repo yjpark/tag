@@ -42,3 +42,21 @@ impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
         }
     }
 }
+
+impl<TD: Debug, ID: Debug + ItemData> Item<TD, ID> {
+    pub fn new(uuid: Uuid, data: ID) -> Self {
+        Self {
+            uuid,
+            data,
+            tags: DashMap::new(),
+        }
+    }
+
+    pub fn new_arc(uuid: Uuid, data: ID) -> Arc<Self> {
+        Arc::new(Self::new(uuid, data))
+    }
+
+    pub fn add_tag(arc_self: &mut Arc<Self>, tag: Arc<Tag<TD, ID>>) {
+        arc_self.tags.insert(tag.uuid().clone(), tag);
+    }
+}

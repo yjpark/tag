@@ -81,3 +81,33 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, V
         (self.async_loader)(&self.data, hash).await
     }
 }
+
+impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
+    where
+        TD: Debug + Send + Sync,
+        ID: Debug + ItemData + Send + Sync,
+        VD: Debug + Send + Sync,
+        Body: Send + Sync,
+        Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,
+        AsyncLoader: Fn(&VD, &Hash) -> TF + Send + Sync,
+        TF: Future<Output = LoadBodyResult<Body>> + Send + Sync,
+{
+    // loader and async_loader are private
+    pub fn new(
+        uuid: Uuid,
+        data: VD,
+        root: Arc<Tag<TD, ID>>,
+        items: DashMap<Uuid, Arc<Item<TD, ID>>>,
+        loader: Loader,
+        async_loader: AsyncLoader,
+    ) -> Self {
+        Self {
+            uuid,
+            data,
+            root,
+            items,
+            loader,
+            async_loader,
+        }
+    }
+}
