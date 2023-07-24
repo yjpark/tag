@@ -35,7 +35,7 @@ pub fn load_volume<
         ItemDataFactory: Fn(&Uuid) -> ID,
         ItemUuidIterator: Iterator<Item = Uuid>,
 {
-    let mut root = Tag::<TD, ID>::root(uuid.clone(), tag_data_factory(&uuid));
+    let mut root = Tag::<TD, ID>::root_arc(uuid.clone(), tag_data_factory(&uuid));
     let mut items = IndexMap::new();
     for item_uuid in item_uuids {
         let item_data = item_data_factory(&item_uuid);
@@ -46,12 +46,12 @@ pub fn load_volume<
         };
         items.insert(item_uuid.clone(), Arc::new(item));
     }
-    Ok(Volume::<TD, ID, VD, Body, Loader, AsyncLoader, TF>::new(
+    Ok(Volume::<TD, ID, VD, Body, Loader, AsyncLoader, TF>{
         uuid,
         data,
-        Arc::new(root),
+        root,
         items,
         loader,
         async_loader,
-    ))
+    })
 }

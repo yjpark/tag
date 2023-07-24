@@ -5,8 +5,8 @@ use super::prelude::{Uuid, IndexMap, CoreTag, ProtoTag, ModelTag, Item, ItemData
 
 #[derive(Clone, Debug)]
 pub struct Tag<TD: Debug, ID: Debug + ItemData> {
-    pub data: TD,
     pub proto: Arc<dyn ProtoTag + Send + Sync>,
+    pub data: TD,
     pub parent: Option<Arc<Tag<TD, ID>>>,
     pub children: IndexMap<Uuid, Arc<Tag<TD, ID>>>,
     pub items: IndexMap<Uuid, Arc<Item<TD, ID>>>,
@@ -68,14 +68,30 @@ impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
 }
 
 impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
-    pub fn root(uuid: Uuid, data: TD) -> Self {
-        let proto = Arc::new(<dyn ProtoTag>::root(uuid.clone()));
+    pub fn new(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Arc<Self>>) -> Self {
         Self {
-            data,
             proto,
-            parent: None,
+            data,
+            parent: parent,
             children: IndexMap::new(),
             items: IndexMap::new(),
         }
+    }
+
+    pub fn new_arc(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Arc<Self>>) -> Arc<Self> {
+        Arc::new(Self::new(proto, data, parent))
+    }
+
+    pub fn root_arc(uuid: Uuid, data: TD) -> Arc<Self> {
+        let proto = Arc::new(<dyn ProtoTag>::root(uuid.clone()));
+        Self::new_arc(proto, data, None)
+    }
+
+    pub fn add_child(arc_self: &mut Arc<Self>,
+        child_proto: Arc<dyn ProtoTag + Send + Sync>,
+        child_data: TD,
+    ) {
+        let child = Self::new_arc(child_proto,  child_data, Some(arc_self.clone()));
+        arc_self.children.insert(child.uuid().clone(), child);
     }
 }
