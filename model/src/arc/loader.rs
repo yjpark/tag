@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use std::future::Future;
 use snafu::prelude::*;
-use super::prelude::{Uuid, Hash, IndexMap, ValTag, ProtoTag, ItemData, Tag, LoadBodyResult, Volume};
+use super::prelude::{Uuid, Hash, IndexMap, Item, ItemData, Tag, LoadBodyResult, Volume};
 
 #[derive(Debug, Snafu)]
 pub enum LoadVolumeError {
@@ -17,12 +17,11 @@ pub fn load_volume<
         TagDataFactory, ItemDataFactory, ItemUuidIterator> (
     uuid: Uuid,
     data: VD,
-    root_data: TD,
     loader: Loader,
     async_loader: AsyncLoader,
     tag_data_factory: TagDataFactory,
     item_data_factory: ItemDataFactory,
-    items: ItemUuidIterator,
+    item_uuids: ItemUuidIterator,
 ) -> Result<Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>, LoadVolumeError>
     where
         TD: Debug + Send + Sync,
@@ -34,10 +33,19 @@ pub fn load_volume<
         TF: Future<Output = LoadBodyResult<Body>> + Send + Sync,
         TagDataFactory: Fn(&Uuid) -> TD,
         ItemDataFactory: Fn(&Uuid) -> ID,
-        ItemUuidIterator: Iterator<Item = ID>,
+        ItemUuidIterator: Iterator<Item = Uuid>,
 {
-    let root = Tag::<TD, ID>::root(uuid.clone(), root_data);
-    let items = IndexMap::new();
+    let mut root = Tag::<TD, ID>::root(uuid.clone(), tag_data_factory(&uuid));
+    let mut items = IndexMap::new();
+    for item_uuid in item_uuids {
+        let item_data = item_data_factory(&item_uuid);
+        let mut item = Item::<TD, ID> {
+            uuid: item_uuid.clone(),
+            data: item_data,
+            tags: IndexMap::new(),
+        };
+        items.insert(item_uuid.clone(), Arc::new(item));
+    }
     Ok(Volume::<TD, ID, VD, Body, Loader, AsyncLoader, TF>::new(
         uuid,
         data,
