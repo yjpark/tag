@@ -11,15 +11,6 @@ repository.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-all = [
-    "arc",
-    "serde",
-]
-
-arc = [
-    "dashmap",
-]
-
 serde = [
     "dep:serde",
     "tag_proto/serde",
@@ -32,5 +23,5 @@ snafu = { workspace = true }
 blake3 = { workspace = true }
 tracing = { workspace = true }
 async-trait = { workspace = true }
-dashmap = { workspace = true, optional = true }
+dashmap = { workspace = true }
 serde = { workspace = true, optional = true }

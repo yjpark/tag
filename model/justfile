@@ -1,13 +1,7 @@
 build-everything:
-    just build-arc
     just build-default
     just build-serde
-    just build-all
 build-default:
     cargo build
 build-serde:
     cargo build --features "serde"
-build-arc:
-    cargo build --features "arc"
-build-all:
-    cargo build --features "all"
