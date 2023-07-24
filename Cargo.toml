@@ -51,6 +51,7 @@ surrealdb = { path = "external/surrealdb/lib" }
 num_cpus = "1.15.0"
 
 indexmap = { version = "2.0.0" }
+dashmap = { version = "5.5.0" }
 secrecy = { version = "0.8.0" }
 snafu = "0.7.4"
 async-trait = "0.1.64"
