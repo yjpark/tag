@@ -38,7 +38,7 @@ pub fn load_volume<
                     let parent = proto_tag.parent()
                         .and_then(|x| volume.get_tag(&x))
                         .unwrap_or_else(|| volume.root.clone() );
-                    Tag::<TD, ID>::new_child(parent, proto_tag.clone(), tag_data_factory(tag_uuid))
+                    Tag::<TD, ID>::new_child(&parent, proto_tag.clone(), tag_data_factory(tag_uuid))
                 });
             tag.add_item(item.clone());
         }

@@ -1,10 +1,11 @@
 use std::sync::Arc;
+use std::slice::Iter;
 use std::fmt::Debug;
 
 use super::prelude::{Uuid, DashMap, ProtoTag, Tag, ModelItem, ModelItemData};
 
 pub trait ItemData : ModelItemData {
-    fn iter_tags(&self) -> dyn Iterator<Item = Arc<dyn ProtoTag>>;
+    fn iter_tags<'a>(&self) -> Iter<'a, Arc<dyn ProtoTag + Send + Sync>>;
 }
 
 #[derive(Clone, Debug)]
