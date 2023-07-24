@@ -1,0 +1,8 @@
+build-everything:
+    just build-default
+    just build-serde
+build-default:
+    cargo build
+build-serde:
+    cargo build --features "serde"
+

@@ -1,0 +1,27 @@
+[package]
+publish = false
+name = "tag_model"
+version = "0.1.0"
+
+edition.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+serde = [
+    "dep:serde",
+    "tag_proto/serde",
+]
+
+[dependencies]
+tag_proto = { workspace = true }
+derive_builder = { workspace = true }
+
+snafu = { workspace = true }
+blake3 = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true, optional = true }
