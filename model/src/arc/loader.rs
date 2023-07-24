@@ -29,7 +29,8 @@ pub fn load_volume<
         loader, async_loader, uuid, data, tag_data_factory(&uuid),
     );
     for item_uuid in item_uuids {
-        let item_data = item_data_factory(&item_uuid);
+        let item = volume.new_item(item_uuid.clone(), item_data_factory(&item_uuid));
+        item.data.each_tag
     }
     volume
 }
