@@ -57,6 +57,6 @@ impl<TD: Debug, ID: Debug + ItemData> Item<TD, ID> {
     }
 
     pub fn add_tag(&self, tag: Arc<Tag<TD, ID>>) {
-        self.tags.insert(tag.as_ref().proto.uuid().clone(), tag);
+        self.tags.insert(tag.proto.uuid().clone(), tag);
     }
 }

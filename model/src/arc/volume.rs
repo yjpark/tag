@@ -110,4 +110,8 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> Volume<TD, ID, VD, Body, Loader,
             async_loader,
         }
     }
+
+    pub fn add_item(&self, item: Arc<Item<TD, ID>>) {
+        self.items.insert(item.uuid.clone(), item);
+    }
 }

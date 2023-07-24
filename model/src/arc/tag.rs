@@ -106,7 +106,7 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
     }
 
     pub fn add_child(&self, child: Arc<Self>) {
-        self.children.insert(child.as_ref().uuid().clone(), child);
+        self.children.insert(child.uuid().clone(), child);
     }
 
     pub fn new_item(arc_self: &Arc<Self>,
@@ -120,6 +120,6 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
     }
 
     pub fn add_item(&self, item: Arc<Item<TD, ID>>) {
-        self.items.insert(item.as_ref().uuid.clone(), item);
+        self.items.insert(item.uuid.clone(), item);
     }
 }
