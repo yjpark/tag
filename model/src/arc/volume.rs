@@ -4,7 +4,7 @@ use std::future::Future;
 
 use async_trait::async_trait;
 
-use super::prelude::{Uuid, Hash, DashMap, LoadBodyResult, Item, ItemData, Tag,ModelVolume};
+use super::prelude::{Uuid, Hash, DashMap, LoadBodyResult, Item, ItemData, ProtoTag, Tag, ModelVolume};
 
 #[derive(Clone, Debug)]
 pub struct Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
