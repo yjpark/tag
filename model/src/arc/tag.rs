@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 use std::fmt::Debug;
 
 use super::prelude::{Uuid, DashMap, CoreTag, ProtoTag, ModelTag, Item, ItemData};
@@ -7,7 +7,7 @@ use super::prelude::{Uuid, DashMap, CoreTag, ProtoTag, ModelTag, Item, ItemData}
 pub struct Tag<TD: Debug, ID: Debug + ItemData> {
     pub proto: Arc<dyn ProtoTag + Send + Sync>,
     pub data: TD,
-    pub parent: Option<Arc<Tag<TD, ID>>>,
+    pub parent: Option<Weak<Tag<TD, ID>>>,
     pub children: DashMap<Uuid, Arc<Tag<TD, ID>>>,
     pub items: DashMap<Uuid, Arc<Item<TD, ID>>>,
 }
@@ -18,13 +18,15 @@ impl<TD: Debug, ID: Debug + ItemData> CoreTag for Tag<TD, ID> {
     }
 
     fn has_parent(&self) -> bool {
-        self.parent.is_some()
+        self.parent.as_ref().and_then(|x| x.upgrade()).is_some()
     }
 }
 
 impl<TD: Debug, ID: Debug + ItemData> ProtoTag for Tag<TD, ID> {
-    fn parent(&self) -> Option<&Uuid> {
-        self.parent.as_ref().map(|x| { x.uuid() })
+    fn parent(&self) -> Option<Uuid> {
+        self.parent.as_ref()
+            .and_then(|x| x.upgrade())
+            .map(|x| x.uuid().clone())
     }
 }
 
@@ -77,7 +79,7 @@ impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
 }
 
 impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
-    pub fn new(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Arc<Self>>) -> Self {
+    pub fn new(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Weak<Self>>) -> Self {
         Self {
             proto,
             data,
@@ -87,7 +89,7 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         }
     }
 
-    pub fn new_arc(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Arc<Self>>) -> Arc<Self> {
+    pub fn new_arc(proto: Arc<dyn ProtoTag + Send + Sync>, data: TD, parent: Option<Weak<Self>>) -> Arc<Self> {
         Arc::new(Self::new(proto, data, parent))
     }
 
@@ -100,7 +102,7 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         child_proto: Arc<dyn ProtoTag + Send + Sync>,
         child_data: TD,
     ) -> Arc<Self> {
-        let child = Self::new_arc(child_proto,  child_data, Some(arc_self.clone()));
+        let child = Self::new_arc(child_proto,  child_data, Some(Arc::downgrade(arc_self)));
         arc_self.add_child(child.clone());
         child
     }

@@ -111,6 +111,15 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> Volume<TD, ID, VD, Body, Loader,
         }
     }
 
+    pub fn new_item(&self,
+        item_uuid: Uuid,
+        item_data: ID,
+    ) -> Arc<Item<TD, ID>> {
+        let item = Item::<TD, ID>::new_arc(item_uuid, item_data);
+        self.add_item(item.clone());
+        item
+    }
+
     pub fn add_item(&self, item: Arc<Item<TD, ID>>) {
         self.items.insert(item.uuid.clone(), item);
     }
