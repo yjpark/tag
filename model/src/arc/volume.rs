@@ -36,8 +36,8 @@ impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<VD, TD, I
         AsyncLoader: Fn(&VD, &Hash) -> TF + Send + Sync,
         TF: Future<Output = LoadBodyResult<Body>> + Send + Sync,
 {
-    type Tag = Tag<TD, ID>;
     type Data = VD;
+    type Tag = Tag<TD, ID>;
     type Item = Item<TD, ID>;
     type Body = Body;
 

@@ -1,7 +1,7 @@
 use snafu::prelude::*;
 use async_trait::async_trait;
 
-use crate::prelude::{Uuid, Hash};
+use crate::prelude::{Uuid, Hash, Tag, Item};
 
 #[derive(Debug, Snafu)]
 pub enum LoadBodyError {
@@ -17,9 +17,9 @@ pub type LoadBodyResult<T> = std::result::Result<T, LoadBodyError>;
 
 #[async_trait]
 pub trait Volume {
-    type Tag;
     type Data;
-    type Item;
+    type Tag: Tag;
+    type Item: Item;
     type Body;
 
     fn uuid(&self) -> &Uuid;
