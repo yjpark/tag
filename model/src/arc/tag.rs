@@ -93,11 +93,6 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         Arc::new(Self::new(proto, data, parent))
     }
 
-    pub fn root_arc(uuid: Uuid, data: TD) -> Arc<Self> {
-        let proto = Arc::new(<dyn ProtoTag>::root(uuid.clone()));
-        Self::new_arc(proto, data, None)
-    }
-
     pub fn new_child(arc_self: &Arc<Self>,
         child_proto: Arc<dyn ProtoTag + Send + Sync>,
         child_data: TD,

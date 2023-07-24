@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use super::prelude::{Uuid, Hash, DashMap, LoadBodyResult, Item, ItemData, Tag,ModelVolume};
 
 #[derive(Clone, Debug)]
-pub struct Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
+pub struct Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug,
         ID: Debug + ItemData,
@@ -16,17 +16,17 @@ pub struct Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
         AsyncLoader: Fn(&VD, &Hash) -> TF,
         TF: Future<Output = LoadBodyResult<Body>>
 {
+    loader: Loader,
+    async_loader: AsyncLoader,
+
     pub uuid: Uuid,
     pub data: VD,
     pub root: Arc<Tag<TD, ID>>,
     pub items: DashMap<Uuid, Arc<Item<TD, ID>>>,
-
-    loader: Loader,
-    async_loader: AsyncLoader,
 }
 
 #[async_trait]
-impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
+impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug + Send + Sync,
         ID: Debug + ItemData + Send + Sync,
@@ -82,7 +82,7 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, V
     }
 }
 
-impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
+impl<VD, TD, ID, Body, Loader, AsyncLoader, TF> Volume<VD, TD, ID, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug + Send + Sync,
         ID: Debug + ItemData + Send + Sync,
@@ -94,20 +94,21 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> Volume<TD, ID, VD, Body, Loader,
 {
     // loader and async_loader are private
     pub fn new(
-        uuid: Uuid,
-        data: VD,
-        root: Arc<Tag<TD, ID>>,
-        items: DashMap<Uuid, Arc<Item<TD, ID>>>,
         loader: Loader,
         async_loader: AsyncLoader,
+        uuid: Uuid,
+        data: VD,
+        root_data: TD,
     ) -> Self {
+        let root_proto = Arc::new(<dyn ProtoTag>::root(uuid.clone()));
+        let root = Tag::<TD, ID>::new_arc(root_proto, root_data, None);
         Self {
+            loader,
+            async_loader,
             uuid,
             data,
             root,
-            items,
-            loader,
-            async_loader,
+            items: DashMap::new(),
         }
     }
 
