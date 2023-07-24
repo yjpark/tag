@@ -135,4 +135,20 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
     pub fn add_item(&self, item: Arc<Item<TD, ID>>) {
         self.items.insert(item.uuid.clone(), item);
     }
+
+    pub fn get_item(&self, uuid: &Uuid) -> Option<Arc<Item<TD, ID>>> {
+        self.items.get(uuid).map(|x| x.value().clone() )
+    }
+
+    pub fn get_item_deep(&self, uuid: &Uuid) -> Option<Arc<Item<TD, ID>>> {
+        if let Some(child) = self.get_item(uuid) {
+            return Some(child);
+        }
+        for kv in self.children.iter() {
+            if let Some(child) = kv.value().get_item_deep(uuid) {
+                return Some(child);
+            }
+        }
+        None
+    }
 }
