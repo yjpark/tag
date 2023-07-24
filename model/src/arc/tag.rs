@@ -96,7 +96,7 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         Self::new_arc(proto, data, None)
     }
 
-    pub fn new_child(arc_self: &mut Arc<Self>,
+    pub fn new_child(arc_self: &Arc<Self>,
         child_proto: Arc<dyn ProtoTag + Send + Sync>,
         child_data: TD,
     ) -> Arc<Self> {
@@ -105,11 +105,11 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         child
     }
 
-    pub fn add_child(arc_self: &mut Arc<Self>, child: Arc<Self>) {
+    pub fn add_child(arc_self: &Arc<Self>, child: Arc<Self>) {
         arc_self.children.insert(child.as_ref().uuid().clone(), child);
     }
 
-    pub fn new_item(arc_self: &mut Arc<Self>,
+    pub fn new_item(arc_self: &Arc<Self>,
         item_uuid: Uuid,
         item_data: ID,
     ) -> Arc<Item<TD, ID>> {
@@ -119,7 +119,7 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         item
     }
 
-    pub fn add_item(arc_self: &mut Arc<Self>, item: Arc<Item<TD, ID>>) {
+    pub fn add_item(arc_self: &Arc<Self>, item: Arc<Item<TD, ID>>) {
         arc_self.items.insert(item.as_ref().uuid.clone(), item);
     }
 }
