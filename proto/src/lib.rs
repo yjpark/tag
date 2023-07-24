@@ -10,10 +10,10 @@ pub mod map;
 pub mod indexmap;
 
 pub mod tags;
+pub mod misc;
 
 #[cfg(feature = "serde")]
 pub mod serde;
-
 
 pub mod prelude {
     #[doc(hidden)]
@@ -36,6 +36,9 @@ pub mod prelude {
 
     #[doc(hidden)]
     pub use crate::tags::Tags;
+
+    #[doc(hidden)]
+    pub use crate::misc::*;
 
     #[cfg(feature = "serde")]
     #[doc(hidden)]

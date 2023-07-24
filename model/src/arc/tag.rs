@@ -66,3 +66,16 @@ impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
         false
     }
 }
+
+impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
+    pub fn root(uuid: Uuid, data: TD) -> Self {
+        let proto = Arc::new(<dyn ProtoTag>::root(uuid.clone()));
+        Self {
+            data,
+            proto,
+            parent: None,
+            children: IndexMap::new(),
+            items: IndexMap::new(),
+        }
+    }
+}

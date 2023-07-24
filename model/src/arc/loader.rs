@@ -2,9 +2,7 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use std::future::Future;
 use snafu::prelude::*;
-use tag_proto::{prelude::IndexMap, val::ValTag};
-
-use super::prelude::{Uuid, Hash, ItemData, Tag, LoadBodyResult, Volume};
+use super::prelude::{Uuid, Hash, IndexMap, ValTag, ProtoTag, ItemData, Tag, LoadBodyResult, Volume};
 
 #[derive(Debug, Snafu)]
 pub enum LoadVolumeError {
@@ -38,18 +36,7 @@ pub fn load_volume<
         ItemDataFactory: Fn(&Uuid) -> ID,
         ItemUuidIterator: Iterator<Item = ID>,
 {
-    let root_proto = ValTag::<bool> {
-        uuid: Uuid::new_v4(),
-        parent: None,
-        val: false,
-    };
-    let root = Tag::<TD, ID> {
-        data: root_data,
-        proto: Arc::new(root_proto),
-        parent: None,
-        children: IndexMap::new(),
-        items: IndexMap::new(),
-    };
+    let root = Tag::<TD, ID>::root(uuid.clone(), root_data);
     let items = IndexMap::new();
     Ok(Volume::<TD, ID, VD, Body, Loader, AsyncLoader, TF>::new(
         uuid,
