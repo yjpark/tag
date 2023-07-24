@@ -1,7 +1,6 @@
 use std::fmt::Debug;
-use std::sync::Arc;
 use std::future::Future;
-use super::prelude::{Uuid, Hash, ProtoTag, Tag, ItemData, LoadBodyResult, Volume};
+use super::prelude::{Uuid, Hash, Tag, ItemData, LoadBodyResult, Volume};
 
 pub fn load_volume<
         VD, TD, ID, Body, Loader, AsyncLoader, TF,
