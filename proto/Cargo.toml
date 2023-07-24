@@ -23,6 +23,7 @@ tag_core = { workspace = true }
 
 uuid = { workspace = true }
 indexmap = { workspace = true }
+downcast-rs = { workspace = true }
 derive_builder = { workspace = true }
 serde = { workspace = true, optional = true }
 typetag = { workspace = true, optional = true }
