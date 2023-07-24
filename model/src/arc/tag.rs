@@ -1,22 +1,18 @@
 use std::sync::Arc;
 use std::fmt::Debug;
-use derive_builder::Builder;
 
-use super::prelude::{Uuid, IndexMap, CoreTag, ProtoTag, ModelTag, Item};
+use super::prelude::{Uuid, IndexMap, CoreTag, ProtoTag, ModelTag, Item, ItemData};
 
-#[derive(Clone, Debug, Builder)]
-pub struct Tag<TD: Debug, ID: Debug> {
+#[derive(Clone, Debug)]
+pub struct Tag<TD: Debug, ID: Debug + ItemData> {
     pub data: TD,
     pub proto: Arc<dyn ProtoTag + Send + Sync>,
-    #[builder(setter(into, strip_option), default)]
     pub parent: Option<Arc<Tag<TD, ID>>>,
-    #[builder(default)]
     pub children: IndexMap<Uuid, Arc<Tag<TD, ID>>>,
-    #[builder(default)]
     pub items: IndexMap<Uuid, Arc<Item<TD, ID>>>,
 }
 
-impl<TD: Debug, ID: Debug> CoreTag for Tag<TD, ID> {
+impl<TD: Debug, ID: Debug + ItemData> CoreTag for Tag<TD, ID> {
     fn uuid(&self) -> &Uuid {
         self.proto.uuid()
     }
@@ -26,13 +22,13 @@ impl<TD: Debug, ID: Debug> CoreTag for Tag<TD, ID> {
     }
 }
 
-impl<TD: Debug, ID: Debug> ProtoTag for Tag<TD, ID> {
+impl<TD: Debug, ID: Debug + ItemData> ProtoTag for Tag<TD, ID> {
     fn parent(&self) -> Option<&Uuid> {
         self.parent.as_ref().map(|x| { x.uuid() })
     }
 }
 
-impl<TD: Debug, ID: Debug> ModelTag for Tag<TD, ID> {
+impl<TD: Debug, ID: Debug + ItemData> ModelTag for Tag<TD, ID> {
     type Data = TD;
     type Item = Item<TD, ID>;
 

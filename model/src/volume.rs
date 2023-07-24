@@ -4,8 +4,8 @@ use async_trait::async_trait;
 use crate::prelude::{Uuid, Hash};
 
 #[derive(Debug, Snafu)]
-pub enum LoadError {
-    #[snafu(display("Not NotSupported: `{}`", hash))]
+pub enum LoadBodyError {
+    #[snafu(display("Not supported: `{}`", hash))]
     NotSupported { hash: Hash },
     #[snafu(display("Not found: `{}`", hash))]
     NotFound { hash: Hash },
@@ -13,7 +13,7 @@ pub enum LoadError {
     IoFailed { error: std::io::Error, info: String },
 }
 
-pub type LoadResult<T> = std::result::Result<T, LoadError>;
+pub type LoadBodyResult<T> = std::result::Result<T, LoadBodyError>;
 
 #[async_trait]
 pub trait Volume {
@@ -30,6 +30,6 @@ pub trait Volume {
     fn get_item(&self, uuid: &Uuid) -> Option<&Self::Item>;
     fn each_item<F: Fn(&Self::Item) -> bool>(&self, callback: &F) -> bool;
 
-    fn load_body(&self, hash: &Hash) -> LoadResult<Self::Body>;
-    async fn load_body_async(&self, hash: &Hash) -> LoadResult<Self::Body>;
+    fn load_body(&self, hash: &Hash) -> LoadBodyResult<Self::Body>;
+    async fn load_body_async(&self, hash: &Hash) -> LoadBodyResult<Self::Body>;
 }

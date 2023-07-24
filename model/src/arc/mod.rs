@@ -1,6 +1,7 @@
 pub mod tag;
 pub mod item;
 pub mod volume;
+pub mod loader;
 
 pub mod prelude {
     #[doc(hidden)]
@@ -18,4 +19,7 @@ pub mod prelude {
 
     #[doc(hidden)]
     pub use super::volume::Volume;
+
+    #[doc(hidden)]
+    pub use super::loader::load_volume;
 }

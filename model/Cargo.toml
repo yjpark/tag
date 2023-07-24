@@ -18,7 +18,6 @@ serde = [
 
 [dependencies]
 tag_proto = { workspace = true }
-derive_builder = { workspace = true }
 
 snafu = { workspace = true }
 blake3 = { workspace = true }

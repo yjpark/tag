@@ -1,42 +1,70 @@
 use std::sync::Arc;
 use std::fmt::Debug;
 use std::future::Future;
-use derive_builder::Builder;
 
 use async_trait::async_trait;
 
-use super::prelude::{Uuid, Hash, IndexMap, LoadResult, Item, Tag,ModelVolume};
+use super::prelude::{Uuid, Hash, IndexMap, LoadBodyResult, Item, ItemData, Tag,ModelVolume};
 
-#[derive(Clone, Debug, Builder)]
+#[derive(Clone, Debug)]
 pub struct Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug,
-        ID: Debug,
+        ID: Debug + ItemData,
         VD: Debug,
-        Loader: Fn(&Hash) -> LoadResult<Body>,
-        AsyncLoader: Fn(&Hash) -> TF,
-        TF: Future<Output = LoadResult<Body>>
+        Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body>,
+        AsyncLoader: Fn(&VD, &Hash) -> TF,
+        TF: Future<Output = LoadBodyResult<Body>>
 {
     pub uuid: Uuid,
     pub data: VD,
     pub root: Arc<Tag<TD, ID>>,
-    #[builder(default)]
     pub items: IndexMap<Uuid, Arc<Item<TD, ID>>>,
 
     loader: Loader,
     async_loader: AsyncLoader,
 }
 
+impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
+    where
+        TD: Debug + Send + Sync,
+        ID: Debug + ItemData + Send + Sync,
+        VD: Debug + Send + Sync,
+        Body: Send + Sync,
+        Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,
+        AsyncLoader: Fn(&VD, &Hash) -> TF + Send + Sync,
+        TF: Future<Output = LoadBodyResult<Body>> + Send + Sync,
+{
+    pub fn new(
+        uuid: Uuid,
+        data: VD,
+        root: Arc<Tag<TD, ID>>,
+        items: IndexMap<Uuid, Arc<Item<TD, ID>>>,
+
+        loader: Loader,
+        async_loader: AsyncLoader,
+    ) -> Self {
+        Self {
+            uuid,
+            data,
+            root,
+            items,
+            loader,
+            async_loader,
+        }
+    }
+}
+
 #[async_trait]
 impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, VD, Body, Loader, AsyncLoader, TF>
     where
         TD: Debug + Send + Sync,
-        ID: Debug + Send + Sync,
+        ID: Debug + ItemData + Send + Sync,
         VD: Debug + Send + Sync,
         Body: Send + Sync,
-        Loader: Fn(&Hash) -> LoadResult<Body> + Send + Sync,
-        AsyncLoader: Fn(&Hash) -> TF + Send + Sync,
-        TF: Future<Output = LoadResult<Body>> + Send + Sync,
+        Loader: Fn(&VD, &Hash) -> LoadBodyResult<Body> + Send + Sync,
+        AsyncLoader: Fn(&VD, &Hash) -> TF + Send + Sync,
+        TF: Future<Output = LoadBodyResult<Body>> + Send + Sync,
 {
     type Tag = Tag<TD, ID>;
     type Data = VD;
@@ -72,11 +100,11 @@ impl<TD, ID, VD, Body, Loader, AsyncLoader, TF> ModelVolume for Volume<TD, ID, V
         false
     }
 
-    fn load_body(&self, hash: &Hash) -> LoadResult<Self::Body> {
-        (self.loader)(hash)
+    fn load_body(&self, hash: &Hash) -> LoadBodyResult<Self::Body> {
+        (self.loader)(&self.data, hash)
     }
 
-    async fn load_body_async(&self, hash: &Hash) -> LoadResult<Self::Body> {
-        (self.async_loader)(hash).await
+    async fn load_body_async(&self, hash: &Hash) -> LoadBodyResult<Self::Body> {
+        (self.async_loader)(&self.data, hash).await
     }
 }

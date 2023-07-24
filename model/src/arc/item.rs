@@ -1,18 +1,16 @@
 use std::sync::Arc;
 use std::fmt::Debug;
-use derive_builder::Builder;
 
-use super::prelude::{Uuid, IndexMap, Tag, ModelItem};
+use super::prelude::{Uuid, IndexMap, Tag, ModelItem, ItemData};
 
-#[derive(Clone, Debug, Builder)]
-pub struct Item<TD: Debug, ID: Debug> {
+#[derive(Clone, Debug)]
+pub struct Item<TD: Debug, ID: Debug + ItemData> {
     pub uuid: Uuid,
     pub data: ID,
-    #[builder(default)]
     pub tags: IndexMap<Uuid, Arc<Tag<TD, ID>>>,
 }
 
-impl<TD: Debug, ID: Debug> ModelItem for Item<TD, ID> {
+impl<TD: Debug, ID: Debug + ItemData> ModelItem for Item<TD, ID> {
     type Data = ID;
     type Tag = Tag<TD, ID>;
 

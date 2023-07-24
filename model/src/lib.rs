@@ -17,11 +17,11 @@ pub mod prelude {
     pub use tag_proto::prelude::{*, Tag as ProtoTag};
 
     #[doc(hidden)]
-    pub use crate::item::Item;
+    pub use crate::item::{Item, ItemData};
 
     #[doc(hidden)]
     pub use crate::tag::Tag;
 
     #[doc(hidden)]
-    pub use crate::volume::{Volume, LoadError, LoadResult};
+    pub use crate::volume::{Volume, LoadBodyError, LoadBodyResult};
 }
