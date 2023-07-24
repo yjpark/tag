@@ -106,6 +106,10 @@ impl<TD: Debug, ID: Debug + ItemData> Tag<TD, ID> {
         self.children.insert(child.uuid().clone(), child);
     }
 
+    pub fn get_child(&self, uuid: &Uuid) -> Option<Arc<Self>> {
+        self.children.get(uuid).map(|x| x.value().clone() )
+    }
+
     pub fn new_item(arc_self: &Arc<Self>,
         item_uuid: Uuid,
         item_data: ID,
