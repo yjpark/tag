@@ -7,7 +7,6 @@ repository = "https://github.com/edger-dev-tag"
 [workspace]
 members = [
     "core",
-    "proto",
     "model",
 ]
 exclude = [
@@ -19,8 +18,9 @@ exclude = [
 
 [workspace.dependencies]
 tag_core = { path = "core", version = "0.1.0" }
-tag_proto = { path = "proto", version = "0.1.0" }
 tag_model = { path = "model", version = "0.1.0" }
+
+edger_tree = { path = "../crates/common/tree" }
 
 dioxus = "0.3.2"
 dioxus-web = "0.3.1"

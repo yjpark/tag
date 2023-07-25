@@ -13,11 +13,11 @@ repository.workspace = true
 [features]
 serde = [
     "dep:serde",
-    "tag_proto/serde",
+    #"edger_tree/serde",
 ]
 
 [dependencies]
-tag_proto = { workspace = true }
+edger_tree = { workspace = true, features = [ "dashmap" ] }
 
 snafu = { workspace = true }
 blake3 = { workspace = true }
