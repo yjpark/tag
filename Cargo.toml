@@ -2,7 +2,7 @@
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/edger-dev/tag"
-repository = "https://github.com/edger-dev-tag"
+repository = "https://github.com/edger-dev/tag"
 
 [workspace]
 members = [
